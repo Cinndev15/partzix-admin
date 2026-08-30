@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Si la petición apunta a un archivo o carpeta que existe directamente en dist/, servirlo desde dist
+  RewriteCond %{DOCUMENT_ROOT}/dist/$1 -f [OR]
+  RewriteCond %{DOCUMENT_ROOT}/dist/$1 -d
+  RewriteRule ^(.*)$ /dist/$1 [L]
+
+  # Si la petición pide la raíz o cualquier otra ruta de la SPA, servir dist/index.html
+  RewriteRule ^$ /dist/index.html [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*)$ /dist/index.html [L]
+</IfModule>
