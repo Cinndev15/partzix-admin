@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, X, Loader2, AlertCircle, CheckCircle, Award, Tag, Calendar, User, FileText, Edit2 } from 'lucide-react';
+import { Search, Plus, X, Loader2, AlertCircle, CheckCircle, Award, Tag, Calendar, User, FileText, Edit2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 export default function Brands({ authToken, apiBaseUrl }) {
   const [brands, setBrands] = useState([]);
@@ -7,6 +7,10 @@ export default function Brands({ authToken, apiBaseUrl }) {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('');
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Modal states - Create
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -205,6 +209,34 @@ export default function Brands({ authToken, apiBaseUrl }) {
     (brand.description && brand.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  // Reset to first page when search or category filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedFilterCategory]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredBrands.length / itemsPerPage) || 1;
+  const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
+  const indexOfLastItem = safeCurrentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentBrands = filteredBrands.slice(indexOfFirstItem, indexOfLastItem);
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (safeCurrentPage <= 3) {
+        pages.push(1, 2, 3, 4, '...', totalPages);
+      } else if (safeCurrentPage >= totalPages - 2) {
+        pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', safeCurrentPage - 1, safeCurrentPage, safeCurrentPage + 1, '...', totalPages);
+      }
+    }
+    return pages;
+  };
+
   return (
     <div className="glass-card" style={{ padding: '2rem' }}>
       <div className="search-bar-container">
@@ -277,7 +309,7 @@ export default function Brands({ authToken, apiBaseUrl }) {
               </tr>
             </thead>
             <tbody>
-              {filteredBrands.map((brand) => (
+              {currentBrands.map((brand) => (
                 <tr key={brand.id}>
                   
                   <td style={{ fontWeight: 600, color: '#111827' }}>
@@ -332,6 +364,93 @@ export default function Brands({ authToken, apiBaseUrl }) {
               ))}
             </tbody>
           </table>
+
+          {/* PAGINATION FOOTER */}
+          <div className="pagination-container">
+            <div className="pagination-info">
+              <span>
+                Mostrando{' '}
+                <strong>
+                  {filteredBrands.length === 0 ? 0 : indexOfFirstItem + 1}
+                </strong>{' '}
+                -{' '}
+                <strong>
+                  {Math.min(indexOfLastItem, filteredBrands.length)}
+                </strong>{' '}
+                de <strong>{filteredBrands.length}</strong> marcas
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span style={{ fontSize: '0.8rem' }}>Por página:</span>
+                <select
+                  className="pagination-select"
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="pagination-controls">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(1)}
+                  disabled={safeCurrentPage === 1}
+                  title="Primera página"
+                >
+                  <ChevronsLeft size={16} />
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={safeCurrentPage === 1}
+                  title="Página anterior"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                {getPageNumbers().map((p, idx) =>
+                  p === '...' ? (
+                    <span key={`dots-${idx}`} className="pagination-ellipsis">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={`page-${p}`}
+                      className={`pagination-btn ${safeCurrentPage === p ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(p)}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={safeCurrentPage === totalPages}
+                  title="Página siguiente"
+                >
+                  <ChevronRight size={16} />
+                </button>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={safeCurrentPage === totalPages}
+                  title="Última página"
+                >
+                  <ChevronsRight size={16} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
