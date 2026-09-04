@@ -32,6 +32,7 @@ import Lines from './Lines';
 import Sublines from './Sublines';
 import Models from './Models';
 import Brands from './Brands';
+import Versions from './Versions';
 import Years from './Years';
 import Products from './Products';
 import Taxes from './Taxes';
@@ -1239,6 +1240,11 @@ export default function Dashboard({ activeTab, setActiveTab, authToken, userEmai
       {/* TAB CONTENT: MARCAS */}
       {activeTab === 'marcas' && (
         <Brands authToken={authToken} apiBaseUrl={API_BASE_URL} />
+      )}
+
+      {/* TAB CONTENT: VERSIONES */}
+      {activeTab === 'versiones' && (
+        <Versions authToken={authToken} apiBaseUrl={API_BASE_URL} />
       )}
 
       {/* TAB CONTENT: ANOS */}

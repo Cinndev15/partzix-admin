@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Login from './components/Login';
 import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
-import { LogOut, LayoutDashboard, Warehouse, TrendingUp, Package, ChevronDown, ChevronRight, Tag, GitFork, Layers, Car, Award, CalendarDays, Percent } from 'lucide-react';
+import { LogOut, LayoutDashboard, Warehouse, TrendingUp, Package, ChevronDown, ChevronRight, Tag, GitFork, Layers, Car, Award, CalendarDays, Percent, GitBranch } from 'lucide-react';
 
 import PartzixLogo from './assets/PARTZIX-AZUL.png';
 
 export default function App() {
   const [currentView, setRawCurrentView] = useState('login'); // 'login', 'forgot-password', 'dashboard'
-  const [activeTab, setRawActiveTab] = useState('resumen'); // 'resumen', 'almacenes', 'ventas', 'categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'anos', 'productos', 'impuestos'
+  const [activeTab, setRawActiveTab] = useState('resumen'); // 'resumen', 'almacenes', 'ventas', 'categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'versiones', 'anos', 'productos', 'impuestos'
   const [authToken, setAuthToken] = useState(localStorage.getItem('adminToken') || '');
   const [userEmail, setUserEmail] = useState(localStorage.getItem('adminEmail') || '');
   const [userName, setUserName] = useState(localStorage.getItem('adminName') || '');
@@ -141,7 +141,7 @@ export default function App() {
 
   // Keep products submenu open if a product view is active
   React.useEffect(() => {
-    if (['categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'anos', 'productos', 'impuestos'].includes(activeTab)) {
+    if (['categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'versiones', 'anos', 'productos', 'impuestos'].includes(activeTab)) {
       setProductsExpanded(true);
     }
   }, [activeTab]);
@@ -180,7 +180,7 @@ export default function App() {
               <div>
                 <button 
                   onClick={() => setProductsExpanded(!productsExpanded)} 
-                  className={`tab-button ${['categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'anos', 'productos', 'impuestos'].includes(activeTab) ? 'active' : ''}`}
+                  className={`tab-button ${['categorias', 'lineas', 'sublineas', 'modelos', 'marcas', 'versiones', 'anos', 'productos', 'impuestos'].includes(activeTab) ? 'active' : ''}`}
                   style={{ width: '100%', justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -232,6 +232,13 @@ export default function App() {
                       style={{ width: '100%', justifyContent: 'flex-start', padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
                     >
                       <Car size={14} /> Modelos
+                    </button>
+                    <button 
+                      onClick={() => setActiveTab('versiones')} 
+                      className={`tab-button ${activeTab === 'versiones' ? 'active' : ''}`}
+                      style={{ width: '100%', justifyContent: 'flex-start', padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+                    >
+                      <GitBranch size={14} /> Versiones
                     </button>
                     <button 
                       onClick={() => setActiveTab('anos')} 
